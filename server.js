@@ -1,9 +1,12 @@
 const express=require('express');
 const app=express();
+
 app.use(express.json());
 const {MongoClient}=require('mongodb');
 const dotenv=require('dotenv');
 dotenv.config();
+
+
 async function createconnection(){
     let client=new MongoClient(process.env.DATABASE_URL);
     await client.connect();
@@ -28,6 +31,8 @@ app.post('/creatementor',async (req,res)=>{
        res.status(400)
     }
 })
+
+
 app.post('/createstudent',async (req,res)=>{
     try{
    const client=await createconnection();
@@ -82,6 +87,73 @@ app.get("/getstudents",async (req,res)=>{
       })
     }
 })
+//to update mentor
+app.put("/updatementor/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log(req.params)
+    try {
+      const client = await createconnection();
+      const mentor = await client
+        .db("mentor-assign")
+        .collection("mentor")
+        .updateOne({ _id: id }, { $set: req.body });
+  
+        res.send(mentor);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  });
+  //to update student
+  app.put("/updatestudent/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log(req.params)
+    try {
+      const client = await createconnection();
+      const student = await client
+        .db("mentor-assign")
+        .collection("student")
+        .updateOne({ _id: id }, { $set: req.body });
+  
+        res.send(student);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  });
+  //to delete mentor
+  app.delete("/deletementor/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+      const client = await createconnection();
+      const mentor = await client
+        .db("mentor-assign")
+        .collection("mentor")
+        .deleteOne({ _id: id });
+  
+      res.send(mentor);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  });
+  //to delete student
+  app.delete("/deletestudent/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log(req.params)
+    try {
+      const client = await createconnection();
+      const student = await client
+        .db("mentor-assign")
+        .collection("student")
+        .deleteOne({ _id: id });
+  
+      res.send(student);
+    } catch (err) {
+      console.log(err);
+      res.send(err);
+    }
+  }); 
 
 
 
